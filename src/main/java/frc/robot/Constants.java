@@ -7,6 +7,13 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
+import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
+import com.ctre.phoenix6.configs.Slot0Configs;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.InvertedValue;
+import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.wpilibj.RobotBase;
 
 /**
@@ -27,5 +34,67 @@ public final class Constants {
 
     /** Replaying from a log file. */
     REPLAY
+  }
+
+  public static class IntakeConstants {
+
+    public static final int extensionMotorID = 9;
+    public static final int primaryRollerMotorID = 10;
+    public static final int secondaryRollerMotorID = 11;
+    public static final int tertiaryRollerMotorID = 12;
+
+    public static final TalonFXConfiguration extensionMotorConfig =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.CounterClockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Coast))
+            .withSlot0(new Slot0Configs().withKP(3).withKI(0.0).withKD(0.0))
+            .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(30.0 / 11.0))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(60)
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(20)
+                    .withSupplyCurrentLimitEnable(true));
+
+    public static final TalonFXConfiguration primaryRollerMotorConfig =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.Clockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Coast))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(40)
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(20)
+                    .withSupplyCurrentLimitEnable(true));
+
+    public static final TalonFXConfiguration secondaryRollerMotorConfig =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.Clockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Coast))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(40)
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(20)
+                    .withSupplyCurrentLimitEnable(true));
+
+    public static final TalonFXConfiguration tertiaryRollerMotorConfig =
+        new TalonFXConfiguration()
+            .withMotorOutput(
+                new MotorOutputConfigs()
+                    .withInverted(InvertedValue.Clockwise_Positive)
+                    .withNeutralMode(NeutralModeValue.Coast))
+            .withCurrentLimits(
+                new CurrentLimitsConfigs()
+                    .withStatorCurrentLimit(40)
+                    .withStatorCurrentLimitEnable(true)
+                    .withSupplyCurrentLimit(20)
+                    .withSupplyCurrentLimitEnable(true));
   }
 }
