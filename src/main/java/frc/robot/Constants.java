@@ -38,10 +38,13 @@ public final class Constants {
 
   public static class IntakeConstants {
 
-    public static final int extensionMotorID = 9;
-    public static final int primaryRollerMotorID = 10;
-    public static final int secondaryRollerMotorID = 11;
-    public static final int tertiaryRollerMotorID = 12;
+    public static final int extensionMotorID = 10;
+    public static final int primaryRollerMotorID = 20;
+    public static final int secondaryRollerMotorID = 30;
+    public static final int tertiaryRollerMotorID = 40;
+
+    public static final double stowPos = 0.5;
+    public static final double extendPos = 12.0;
 
     public static final TalonFXConfiguration extensionMotorConfig =
         new TalonFXConfiguration()
@@ -62,13 +65,13 @@ public final class Constants {
         new TalonFXConfiguration()
             .withMotorOutput(
                 new MotorOutputConfigs()
-                    .withInverted(InvertedValue.Clockwise_Positive)
+                    .withInverted(InvertedValue.CounterClockwise_Positive)
                     .withNeutralMode(NeutralModeValue.Coast))
             .withCurrentLimits(
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(40)
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(20)
+                    .withSupplyCurrentLimit(30)
                     .withSupplyCurrentLimitEnable(true));
 
     public static final TalonFXConfiguration secondaryRollerMotorConfig =
@@ -81,7 +84,7 @@ public final class Constants {
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(40)
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(20)
+                    .withSupplyCurrentLimit(30)
                     .withSupplyCurrentLimitEnable(true));
 
     public static final TalonFXConfiguration tertiaryRollerMotorConfig =
@@ -94,7 +97,7 @@ public final class Constants {
                 new CurrentLimitsConfigs()
                     .withStatorCurrentLimit(40)
                     .withStatorCurrentLimitEnable(true)
-                    .withSupplyCurrentLimit(20)
+                    .withSupplyCurrentLimit(30)
                     .withSupplyCurrentLimitEnable(true));
   }
 }

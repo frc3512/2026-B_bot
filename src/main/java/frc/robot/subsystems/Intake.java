@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix6.hardware.TalonFX;
 import dev.doglog.DogLog;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
@@ -29,41 +30,55 @@ public class Intake extends SubsystemBase {
   }
 
   public void setRollerSpeed(double speed) {
-    primaryRollerMotor.set(speed);
-    secondaryRollerMotor.set(speed);
-    tertiaryRollerMotor.set(speed);
+    primaryRollerMotor.set(-speed);
+    secondaryRollerMotor.set(-speed);
   }
 
-  public void rollerSpeed1(double speed) {
-    primaryRollerMotor.set(speed);
-  }
-
-  public void rollerSpeed2(double speed) {
-    secondaryRollerMotor.set(speed);
-  }
-
-  public void rollerSpeed3(double speed) {
-    tertiaryRollerMotor.set(speed);
+  public void hopperRollerSpeed(double speed) {
+    tertiaryRollerMotor.set(-speed);
   }
 
   public void setExtensionSpeed(double speed) {
     extensionMotor.set(speed);
   }
 
-  public void rezeroExtension() {
-    extensionMotor.setPosition(0.0);
+  public void extensionPosition(double position) {
+    extensionMotor.setPosition(position);
   }
 
-  public void setExtensionPosition(double position) {
-    extensionMotor.setPosition(position);
+  public Command extend() {
+    return runOnce(() -> setExtensionSpeed(-0.5));
+  }
+
+  public Command stow() {
+    return runOnce(() -> setExtensionSpeed(0.25));
+  }
+
+  public Command stopExtension() {
+    return runOnce(() -> setExtensionSpeed(0.0));
+  }
+
+  public Command rollers(double speed) {
+    return runOnce(() -> setRollerSpeed(speed));
+  }
+
+  public Command hopperRoller(double speed) {
+    return runOnce(() -> hopperRollerSpeed(speed));
+  }
+
+  public Command stopRollers() {
+    return runOnce(() -> setRollerSpeed(0.0));
+  }
+
+  public void rezeroExtension() {
+    extensionMotor.setPosition(0.0);
   }
 
   public void periodic() {
     super.periodic();
 
-    DogLog.log(
-        "Intake/Extension Position: " + extensionMotor.getPosition(),
-        "Intake/Extension Speed: " + extensionMotor.get(),
-        "Intake/Roller Speed: " + primaryRollerMotor.get());
+    DogLog.log("Intake/Extension Position: ", extensionMotor.getRotorPosition().getValueAsDouble());
+    DogLog.log("Intake/Extension Speed: ", extensionMotor.get());
+    DogLog.log("Intake/Roller Speed: ", primaryRollerMotor.get());
   }
 }

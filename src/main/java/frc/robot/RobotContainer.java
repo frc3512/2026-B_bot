@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.commands.DriveCommands;
@@ -125,6 +124,7 @@ public class RobotContainer {
         "Drive SysId (Dynamic Forward)", drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
     autoChooser.addOption(
         "Drive SysId (Dynamic Reverse)", drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
+    autoChooser.addOption("Goop", getAutonomousCommand());
 
     // Configure the button bindings
     configureButtonBindings();
@@ -141,26 +141,13 @@ public class RobotContainer {
     drive.setDefaultCommand(
         DriveCommands.joystickDrive(
             drive,
-            () -> -controller.getLeftY(),
-            () -> -controller.getLeftX(),
+            () -> controller.getLeftY(),
+            () -> controller.getLeftX(),
             () -> -controller.getRightX()));
-
-    // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> Rotation2d.kZero));
-
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
     controller
-        .b()
+        .x()
         .onTrue(
             Commands.runOnce(
                     () ->
@@ -170,31 +157,49 @@ public class RobotContainer {
                 .ignoringDisable(true));
 
     controller.rightTrigger().whileTrue(intake());
-    controller.rightTrigger().onFalse(stow());
+    controller.rightTrigger().whileFalse(killRollers());
 
-    controller.povDown().onTrue(new InstantCommand(() -> intake.setExtensionSpeed(0.5)));
-    controller.povDown().onFalse(new InstantCommand(() -> intake.setRollerSpeed(0.0)));
+    controller.leftTrigger().whileTrue(outtake());
+    controller.leftTrigger().whileFalse(killRollers());
 
-    controller.povUp().onTrue(new InstantCommand(() -> intake.rollerSpeed1(0.25)));
-    controller.povUp().onFalse(new InstantCommand(() -> intake.setRollerSpeed(0.0)));
+    controller.povDown().whileTrue(intake.rollers(0.5));
+    controller.povDown().whileFalse(intake.stopRollers());
 
-    controller.povLeft().onTrue(new InstantCommand(() -> intake.rollerSpeed2(0.25)));
-    controller.povLeft().onFalse(new InstantCommand(() -> intake.setRollerSpeed(0.0)));
+    controller.b().onTrue(stow());
 
-    controller.povRight().onTrue(new InstantCommand(() -> intake.rollerSpeed3(0.25)));
-    controller.povRight().onFalse(new InstantCommand(() -> intake.setRollerSpeed(0.0)));
+    controller.y().onTrue(new InstantCommand(() -> intake.setRollerSpeed(0.75)));
+    controller.y().onFalse(new InstantCommand(() -> intake.setRollerSpeed(0.0)));
   }
 
-  public SequentialCommandGroup intake() {
-    return new InstantCommand(() -> intake.setExtensionSpeed(0.2))
-        .andThen(new InstantCommand(() -> intake.setExtensionPosition(2)))
-        .andThen(new InstantCommand(() -> intake.setRollerSpeed(0.2)));
+  public Command intake() {
+    return Commands.sequence(
+        intake.extend(),
+        intake.rollers(0.75),
+        Commands.waitSeconds(0.3),
+        intake.stopExtension(),
+        intake.hopperRoller(0.5));
   }
 
-  public SequentialCommandGroup stow() {
-    return new InstantCommand(() -> intake.setExtensionSpeed(-0.2))
-        .andThen(new InstantCommand(() -> intake.setExtensionPosition(0.0)))
-        .andThen(new InstantCommand(() -> intake.setRollerSpeed(0.0)));
+  public Command stow() {
+    return Commands.sequence(
+        intake.stow(),
+        intake.stopRollers(),
+        Commands.waitSeconds(0.3),
+        intake.stopExtension(),
+        intake.hopperRoller(0.0));
+  }
+
+  public Command outtake() {
+    return Commands.sequence(
+        intake.extend(),
+        intake.rollers(-0.75),
+        Commands.waitSeconds(0.3),
+        intake.stopExtension(),
+        intake.hopperRoller(-0.5));
+  }
+
+  public Command killRollers() {
+    return Commands.sequence(intake.stopRollers(), intake.hopperRoller(0.0));
   }
 
   /**
